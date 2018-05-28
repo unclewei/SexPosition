@@ -10,11 +10,10 @@
         android:orientation="vertical">
 
             <ImageView
-                android:id="@+id/sex_position"
+                android:id="@+id/img_sex_position"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:paddingBottom="50dp"
-                android:src="@color/colorAccent" />
+                android:paddingBottom="50dp" />
 
             <com.example.administrator.sexrecroding.layout.SlideBottomLayout
                 android:id="@+id/slideLayout"
