@@ -5,15 +5,14 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
-import android.app.Application;
 import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -22,7 +21,6 @@ import com.bumptech.glide.Glide;
 import com.example.administrator.sexrecroding.Base.BaseBindingFragment;
 import com.example.administrator.sexrecroding.Bean.Position;
 import com.example.administrator.sexrecroding.databinding.HomeFragmentBinding;
-import com.google.gson.Gson;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -39,6 +37,7 @@ public class HomeFragment extends BaseBindingFragment<HomeFragmentBinding> {
 
     private static HomeFragment homeFragment;
     private PositionHandle positionHandle;
+    private MediaPlayer mediaPlayer;
     private int tran = 0xFF000000;
     private int end = 0x00000000;
 
@@ -57,6 +56,8 @@ public class HomeFragment extends BaseBindingFragment<HomeFragmentBinding> {
     protected void bindData(HomeFragmentBinding dataBinding) {
         final FloatingActionButton fab = getActivity().findViewById(R.id.fab);
         final AppBarLayout appBarLayout = getActivity().findViewById(R.id.app_bar_layout);
+        initMediaPlayer();
+        //TODO:有一个停止播放音乐的按钮
         positionHandle = new PositionHandle();
         positionHandle.setList(getValue());
         positionHandle.setDesc(new WeakReference<TextView>(binding.tvDesc));
@@ -87,6 +88,11 @@ public class HomeFragment extends BaseBindingFragment<HomeFragmentBinding> {
     }
 
 
+    private void initMediaPlayer() {
+        mediaPlayer = MediaPlayer.create(getActivity(), R.raw.naufragio);
+        mediaPlayer.start();
+    }
+
     private static int randomPosition(int min, int max) {
         Random random = new Random();
         return random.nextInt(max) % (max - min + 1) + min;
@@ -115,6 +121,34 @@ public class HomeFragment extends BaseBindingFragment<HomeFragmentBinding> {
         list.add(position3);
         list.add(position4);
         return list;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mediaPlayer != null && !mediaPlayer.isPlaying()) {
+            mediaPlayer.start();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+            mediaPlayer.pause();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mediaPlayer != null) {
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
+        if (positionHandle != null) {
+            positionHandle = null;
+        }
     }
 
     @Override
@@ -167,7 +201,7 @@ public class HomeFragment extends BaseBindingFragment<HomeFragmentBinding> {
             mSoundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
                 @Override
                 public void onLoadComplete(SoundPool soundPool, int sampleId, int status) {
-                    soundPool.play(soundPoolMap.get(randomPosition(1, 2)), 0.6f, 0.6f, 1, 0, 1);
+                    soundPool.play(soundPoolMap.get(randomPosition(0, 1)), 0.6f, 0.6f, 1, 0, 1);
                 }
             });
         }
